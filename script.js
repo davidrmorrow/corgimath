@@ -70,9 +70,24 @@ function generateQuestion() {
             correctAnswer = num1 * num2;
             break;
         case '÷':
-            num2 = num1 !== 0 ? num2 : 2;
-            correctAnswer = Math.floor(num1 / num2);
-            num1 = correctAnswer * num2;
+            // Find the divisors of num1 that are greater than min,
+            // ensuring that there are at least two of them
+            let divisors = findDivisors(num1, min);
+            while (divisors.length < 2) {
+               num1 = Math.floor(Math.random() * (max - min + 1)) + min; // Pick a new num1 if needed
+               divisors = findDivisors(num1, min);
+            }
+
+            // Randomly select one of the divisors for num2, 
+            // but weighted against choosing the last element, 
+            // which will always equal num1
+            if (divisors.length === 2) {
+                num2 = Math.random() < 0.125 ? divisors[1] : divisors[0];
+            }
+            else {
+                num2 = Math.random() < (0.25/divisors.length) ? divisors[divisors.length] : divisors[Math.floor(Math.random()*(divisors.length-1))];
+            }
+            correctAnswer = num1 / num2;
             break;
         default:
             console.error("Unknown mathematical operation requested: " + operation);
@@ -85,6 +100,15 @@ function generateQuestion() {
     maxPossibleScore += 4;
     generateAnswers(correctAnswer);
 }
+
+   function findDivisors(n, min) {
+     const divisors = [];
+     for (let i=min; i<=n; i++) {
+        if (n % i === 0) divisors.push(i);
+     }
+     console.log(divisors);
+     return divisors;
+   }
 
 function generateAnswers(correctAnswer) {
     answersElement.innerHTML = '';
