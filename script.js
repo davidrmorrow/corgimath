@@ -144,7 +144,9 @@ function checkAnswer(clickedButton, correctAnswer) {
         score += incorrectAnswersRemaining; // Adjust score calculation if needed
         scoreElement.innerText = `Score: ${score}`;
         checkScoreMilestone(); // Check for milestones after updating the score
-        setTimeout(generateQuestion, 1000); // Move to the next question after a brief pause
+        const question = questionElement.innerText.slice(8,-1);
+        showCustomToast("Yes! " + question + ' = ' + correctAnswer);
+        setTimeout(generateQuestion, 500); // Move to the next question after a brief pause
     }
 }
 
@@ -223,7 +225,7 @@ function showCustomToast(message) {
     Toastify({
         text: message,
         duration: 1500, // Duration in milliseconds
-        close: true,    // Show close button
+        close: false,    // Show close button
         gravity: "top", // `top` or `bottom`
         position: "right", // `left`, `center` or `right`
         backgroundColor: "#4caf50", // Green color for success
@@ -287,6 +289,42 @@ const debouncedUpdateSettings = debounce((difficulty) => {
     showCustomToast("Settings updated.");
 }, 2000);
 
+function updateSettings(difficulty) {
+    if (difficulty !== 'custom') {
+        gameSettings.currentDifficulty = difficulty;
+        switch (difficulty) {
+            case "easy":
+                updateOperationSettings(true, true, false, false, 1, 10, 1, 10);
+                break;
+            case "medium":
+                updateOperationSettings(true, true, true, true, 1, 10, 1, 10);
+                break;
+            case "hard":
+                updateOperationSettings(true, true, true, true, 1, 99, 1, 12);
+                break;
+        }
+    } else {
+        const add = document.getElementById('add').checked;
+        const subtract = document.getElementById('subtract').checked;
+        const multiply = document.getElementById('multiply').checked;
+        const divide = document.getElementById('divide').checked;
+
+        const minAddSub = parseInt(document.querySelector('.operation[data-operation="+"] .min-number').value);
+        const maxAddSub = parseInt(document.querySelector('.operation[data-operation="+"] .max-number').value);
+        const minSub = parseInt(document.querySelector('.operation[data-operation="-"] .min-number').value);
+        const maxSub = parseInt(document.querySelector('.operation[data-operation="-"] .max-number').value);
+        const minMul = parseInt(document.querySelector('.operation[data-operation="×"] .min-number').value);
+        const maxMul = parseInt(document.querySelector('.operation[data-operation="×"] .max-number').value);
+        const minDiv = parseInt(document.querySelector('.operation[data-operation="÷"] .min-number').value);
+        const maxDiv = parseInt(document.querySelector('.operation[data-operation="÷"] .max-number').value);
+
+        // Assuming the same range for addition and subtraction, otherwise adjust accordingly
+        updateOperationSettings(add, subtract, multiply, divide, minAddSub, maxAddSub, minMul, maxMul, minSub, maxSub, minDiv, maxDiv);
+    }
+
+    showCustomToast("Settings updated.");
+}
+
 // Function to update operation settings
 function updateOperationSettings(add, subtract, multiply, divide, minAdd, maxAdd, minMul, maxMul, minSub, maxSub, minDiv, maxDiv) {
     gameSettings.operations['+'].enabled = add;
@@ -307,7 +345,7 @@ function updateOperationSettings(add, subtract, multiply, divide, minAdd, maxAdd
 document.querySelectorAll('input[name="difficulty"]').forEach(radio => {
     radio.addEventListener('change', function () {
         const customSettings = document.getElementById('custom-settings');
-        debouncedUpdateSettings(this.value);
+        updateSettings(this.value);
         if (this.value === 'custom') {
             customSettings.style.display = 'block';
         } else {
@@ -318,9 +356,10 @@ document.querySelectorAll('input[name="difficulty"]').forEach(radio => {
 
 // Attach event listeners to custom settings inputs
 document.querySelectorAll('#custom-settings .operation input, #custom-settings .operation .min-number, #custom-settings .operation .max-number').forEach(element => {
-    element.addEventListener('input', () => debouncedUpdateSettings('custom'));
+    element.addEventListener('input', () => updateSettings('custom'));
 });
 
+/*
 // Initial settings load and apply
 document.addEventListener('DOMContentLoaded', () => {
     const settings = loadSettings();
@@ -334,5 +373,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
+*/
 
 startGame();
