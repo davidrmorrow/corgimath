@@ -231,6 +231,7 @@ function showCustomToast(message) {
     }).showToast();
 }
 
+/*
 // Function to save settings to localStorage
 function saveSettings(settings) {
     localStorage.setItem('customSettings', JSON.stringify(settings));
@@ -247,6 +248,7 @@ function applySettings(settings) {
     // Apply the settings to the game (this part is customized as needed)
     console.log('Applying settings:', settings);
 }
+*/
 
 // Function to update and save settings, and show toast notification
 const debouncedUpdateSettings = debounce((difficulty) => {
@@ -322,7 +324,7 @@ document.querySelectorAll('#custom-settings .operation input, #custom-settings .
 // Initial settings load and apply
 document.addEventListener('DOMContentLoaded', () => {
     const settings = loadSettings();
-    applySettings(settings);
+    //applySettings(settings);
 
     // Populate form with loaded settings
     for (const [key, value] of Object.entries(settings)) {
